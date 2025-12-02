@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import {ref, onMounted, computed, watch} from "vue";
 import { Line } from "vue-chartjs";
 import ChartService from "../service/chartService";
 import { Chart, registerables } from "chart.js";
@@ -24,6 +24,11 @@ const colors = [
 
 const selectedCoinData = ref("1DAY");
 const chartData = ref({});
+
+//
+watch(selectedCoinData, () => {
+  fetchChartData();
+});
 
 const chartOptions = {
   responsive: true,
@@ -58,7 +63,11 @@ const fetchChartData = async () => {
 
       if (chartArray && chartArray.length > 0) {
         const prices = chartArray.map((entry) => ({
-          date: new Date(entry.date).toLocaleTimeString(),
+          // date: new Date(entry.date).toLocaleTimeString(),
+          date:
+              selectedCoinData.value === "1DAY"
+                  ? new Date(entry.date).toLocaleTimeString()
+                  : new Date(entry.date).toLocaleDateString(),
           price: parseFloat(entry.priceUsd),
         }));
 
@@ -118,6 +127,14 @@ function formatPrice(price) {
     <h1 className="font-bold text-white w-full text-center mb-4 text-3xl">
       Today's most popular coins chart
     </h1>
+
+    <div class="w-full flex justify-center mb-4">
+      <select v-model="selectedCoinData" @change="fetchChartData" class="border-none bg-[#454151] text-white font-bold p-[5px] rounded">
+        <option value="1DAY">24 HOURS</option>
+        <option value="7DAY">7 DAYS</option>
+        <option value="1MTH">1 MONTH</option>
+      </select>
+    </div>
 
     <div v-for="coin in topCoins" :key="coin.id" className="w-[45%] mb-6">
       <h2 class="text-white font-bold text-center mb-2">{{ coin.symbol }} Price</h2>
