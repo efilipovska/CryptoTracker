@@ -26,9 +26,9 @@ const selectedCoinData = ref("1DAY");
 const chartData = ref({});
 
 //
-watch(selectedCoinData, () => {
-  fetchChartData();
-});
+// watch(selectedCoinData, () => {
+//   fetchChartData();
+// });
 
 const chartOptions = {
   responsive: true,
