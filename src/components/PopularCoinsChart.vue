@@ -25,11 +25,6 @@ const colors = [
 const selectedCoinData = ref("1DAY");
 const chartData = ref({});
 
-//
-// watch(selectedCoinData, () => {
-//   fetchChartData();
-// });
-
 const chartOptions = {
   responsive: true,
   interaction: {
@@ -101,6 +96,11 @@ onMounted(() => {
     };
   });
 
+  fetchChartData();
+});
+
+// zosto se gubi posle refresh na pageot ????????????????????????????????
+watch(selectedCoinData, () => {
   fetchChartData();
 });
 
