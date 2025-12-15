@@ -50,6 +50,7 @@ const chartOptions = {
 };
 
 const fetchChartData = async () => {
+  chartData.value = {};
   for (const coin of topCoins.value) {
     try {
       const response = await ChartService.getChart(coin.id, selectedCoinData.value);
@@ -88,21 +89,16 @@ const fetchChartData = async () => {
   }
 };
 
-onMounted(() => {
-  topCoins.value.forEach((coin, index) => {
-    coinColors2.value[coin.id] = {
-      backgroundColor: colors[index],
-      borderColor: colors[index].replace("0.5", "1"),
-    };
-  });
-
-  fetchChartData();
-});
-
-// zosto se gubi posle refresh na pageot ????????????????????????????????
-watch(selectedCoinData, () => {
-  fetchChartData();
-});
+// onMounted(() => {
+//   topCoins.value.forEach((coin, index) => {
+//     coinColors2.value[coin.id] = {
+//       backgroundColor: colors[index],
+//       borderColor: colors[index].replace("0.5", "1"),
+//     };
+//   });
+//
+//   fetchChartData();
+// });
 
 function formatPrice(price) {
   if (price >= 1.01) return price.toFixed(2)
@@ -120,6 +116,25 @@ function formatPrice(price) {
     return price.toFixed(2)
   }
 }
+
+watch(
+    () => coinsStore.coinDataTop50,
+    (newCoins) => {
+      if (newCoins.length > 0) {
+        topCoins.value.forEach((coin, index) => {
+          coinColors2.value[coin.id] = {
+            backgroundColor: colors[index],
+            borderColor: colors[index].replace("0.5", "1"),
+          };
+        });
+
+        fetchChartData();
+      }
+    },
+    { immediate: true }
+);
+
+watch(selectedCoinData, fetchChartData);
 </script>
 
 <template>
@@ -129,7 +144,7 @@ function formatPrice(price) {
     </h1>
 
     <div class="w-full flex justify-center mb-4">
-      <select v-model="selectedCoinData" @change="fetchChartData" class="border-none bg-[#454151] text-white font-bold p-[5px] rounded">
+      <select v-model="selectedCoinData" class="border-none bg-[#454151] text-white font-bold p-[5px] rounded">
         <option value="1DAY">24 HOURS</option>
         <option value="7DAY">7 DAYS</option>
         <option value="1MTH">1 MONTH</option>
