@@ -1,8 +1,33 @@
 <script setup>
 
 import { useCoinsStore } from "../store/coinsStore";
+import {computed, ref} from "vue";
 
 const coinStore = useCoinsStore();
+
+const sortBy = ref(null);
+
+const sortedCoins = computed(() => {
+  const coins = [...coinStore.coinDataTop50];
+
+  if (sortBy.value === "change") {
+    return coins.sort(
+        (a, b) =>
+            parseFloat(b.changePercent24Hr) -
+            parseFloat(a.changePercent24Hr)
+    );
+  }
+
+  if (sortBy.value === "volume") {
+    return coins.sort(
+        (a, b) =>
+            parseFloat(b.volumeUsd24Hr) -
+            parseFloat(a.volumeUsd24Hr)
+    );
+  }
+
+  return coins;
+});
 
 </script>
 <template>
@@ -16,7 +41,7 @@ const coinStore = useCoinsStore();
             <p>Price</p>
         </div>
         <div class="max-h-[400px] overflow-y-scroll">
-          <div v-for="coin in coinStore.coinDataTop50" class="grid grid-cols-5 gap-4 mt-[20px] text-gray-300">
+          <div v-for="coin in sortedCoins" :key="coin.id" class="grid grid-cols-5 gap-4 mt-[20px] text-gray-300">
             <p>{{ coin.name }}</p>
             <p  :class="(coin.changePercent24Hr) < 0 ? 'font-bold text-red-500' : 'font-bold text-[#1ECB4F]'">{{ Number(coin.changePercent24Hr).toFixed(2)}}%</p>
             <p>${{ Number(coin.marketCapUsd).toFixed(0) }}M</p>
@@ -25,8 +50,18 @@ const coinStore = useCoinsStore();
         </div>
         </div>
 
-        <div>
+      <div class="flex gap-4 mt-4">
+        <button
+            @click="sortBy = 'change'"
+            class="bg-[#454151] text-white px-4 py-2 rounded font-bold hover:bg-[#5a5669]">
+          Sort by Change %
+        </button>
 
-        </div>
+        <button
+            @click="sortBy = 'volume'"
+            class="bg-[#454151] text-white px-4 py-2 rounded font-bold hover:bg-[#5a5669]">
+          Sort by Volume 24h
+        </button>
+      </div>
     </div>
 </template>
